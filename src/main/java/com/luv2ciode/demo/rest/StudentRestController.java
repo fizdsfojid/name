@@ -2,9 +2,10 @@ package com.luv2ciode.demo.rest;
 
 
 import com.luv2ciode.demo.entity.Student;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.annotation.PostConstruct;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +14,28 @@ import java.util.List;
 @RequestMapping("/api")
 public class StudentRestController {
 
-    @GetMapping("/students")
-    public List<Student> getStudents() {
-        List<Student> students = new ArrayList<>();
+    private List<Student> students;
 
+    @PostConstruct
+    public void LaodData() {
+
+        students = new ArrayList<>();
         students.add(new Student("Roman", "Lahovcyh", "roman@gmail.com", 253232, 50));
         students.add(new Student("Maksym", "Slidarchuk", "maksyn@gmail.com", +48523523, 32));
         students.add(new Student("Ustym", "Yat", "ustym@gmail.com", +485114312, 40));
+    }
 
+    @GetMapping("/students")
+    public List<Student> getStudents() {
         return students;
     }
+    @GetMapping("/students/{studentId}")
+    public Student getStudent(@PathVariable int studentId) {
+        if (studentId < 0 || studentId > students.size()) {
+            throw new StudntNotFoundException("Student id " + studentId + " not found");
+        }
+        return students.get(studentId);
+    }
+
+
 }
